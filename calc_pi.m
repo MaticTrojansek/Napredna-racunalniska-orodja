@@ -31,6 +31,12 @@ plot(ktkrog(:,1),ktkrog(:,2),'ro');
 plot(kroznica(:,1),kroznica(:,2),'k-','LineWidth',2);
 % enakomerni razmik x in y osi
 axis equal
+% označba grafa
+title("Metoda Monte Carlo")
+xlabel("x-koordinate točk")
+ylabel("y-koordiate točk")
+legend('točke znotraj kvadrata', 'točke znotraj kroga','krožnica');
+
 
 hold off;
 
