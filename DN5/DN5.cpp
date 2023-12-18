@@ -178,12 +178,6 @@ int main() {
 	max_T =T[iiT];
       }
     }
-
-  for (int i = 1; i < T.size(); i++)
-  {
-      //std::cout << "T[i] = " << T[i] << endl;
-  }
-  //std::cout << A[4][4] << std::endl;
   
   // Namesto znaka °C je 'C
   std::cout << "Maksimalna temperatura: " << max_T << "'C" << endl;
