@@ -128,15 +128,15 @@ int main() {
   {
   
       for (int i = 0; i < n; i++) {
-          double sum = 100.0;
+          double d = b[i];
 
           for (int j = 0; j < n; j++) {
               if (i != j) {
-                  sum += A[i][j] * T[j];
+                  d -= A[i][j] * T[j];
               }
           }
 
-          T[i] = (b[i] - sum) / A[i][i];
+          T[i] = d / A[i][i];
 
       }
 
@@ -151,25 +151,24 @@ int main() {
    for (int ii = 0; ii < st_it; ii++)
   {
 #pragma omp critical
-      for (int i = 0; i < n; i++) {
-          double sum = 0.0;
+       for (int i = 0; i < n; i++) {
+           double d = b[i];
 
-          for (int j = 0; j < n; j++) {
-              if (i != j) {
-                  sum += A[i][j] * T[j];
-              }
-          }
+           for (int j = 0; j < n; j++) {
+               if (i != j) {
+                   d -= A[i][j] * T[j];
+               }
+           }
 
-          T[i] = (b[i] - sum) / A[i][i];
+           T[i] = d / A[i][i];
 
-      }
+       }
   }
   
   auto end_time_omp = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> time_duration_omp = end_time_omp - start_time_omp;
   std::cout << "Paralelni cas: " << time_duration_omp.count() << " s" << std::endl;
 
-  
   // Za izpis maksimalne vrednosti
   double max_T = 0;
   for (int iiT=0; iiT<n_b; iiT++)
