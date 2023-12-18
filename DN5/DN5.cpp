@@ -116,7 +116,7 @@ int main() {
   vector<double> T;
   for (int iiT = 0; iiT < n_b; iiT++)
   {
-      T.push_back(300);
+      T.push_back(100);
   }
   
   // Izberem št. iteracij
@@ -128,7 +128,7 @@ int main() {
   {
   
       for (int i = 0; i < n; i++) {
-          double sum = 0.0;
+          double sum = 100.0;
 
           for (int j = 0; j < n; j++) {
               if (i != j) {
@@ -144,12 +144,12 @@ int main() {
 
   auto end_time = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> time_duration = end_time - start_time;
-  std::cout << "Cas izvajanja Gauss-Seidel brez OpenMP: " << time_duration.count() << " s" << std::endl;
+  std::cout << "Serijski cas: " << time_duration.count() << " s" << std::endl;
 
   auto start_time_omp = std::chrono::high_resolution_clock::now();
 #pragma omp parallel for
-  for (int ii = 0; ii < st_it; ii++)
-  {   
+   for (int ii = 0; ii < st_it; ii++)
+  {
 #pragma omp critical
       for (int i = 0; i < n; i++) {
           double sum = 0.0;
@@ -164,10 +164,10 @@ int main() {
 
       }
   }
-
+  
   auto end_time_omp = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> time_duration_omp = end_time_omp - start_time_omp;
-  std::cout << "Cas izvajanja Gauss-Seidel z OpenMP: " << time_duration_omp.count() << " s" << std::endl;
+  std::cout << "Paralelni cas: " << time_duration_omp.count() << " s" << std::endl;
 
   
   // Za izpis maksimalne vrednosti
@@ -183,8 +183,10 @@ int main() {
   {
       //std::cout << "T[i] = " << T[i] << endl;
   }
+  //std::cout << A[4][4] << std::endl;
+  
   // Namesto znaka °C je 'C
-  std::cout << "Maksimalna temperatura:" << max_T << "'C" << endl;
+  std::cout << "Maksimalna temperatura: " << max_T << "'C" << endl;
    
   return 0;
 }
