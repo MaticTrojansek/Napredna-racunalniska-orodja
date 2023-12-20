@@ -150,7 +150,7 @@ int main() {
 #pragma omp parallel for
    for (int ii = 0; ii < st_it; ii++)
   {
-#pragma omp critical
+
        for (int i = 0; i < n; i++) {
            double d = b[i];
 
@@ -159,12 +159,12 @@ int main() {
                    d -= A[i][j] * T[j];
                }
            }
-
+#pragma omp critical
            T[i] = d / A[i][i];
 
        }
   }
-  
+
   auto end_time_omp = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> time_duration_omp = end_time_omp - start_time_omp;
   std::cout << "Paralelni cas: " << time_duration_omp.count() << " s" << std::endl;
