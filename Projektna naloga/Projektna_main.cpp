@@ -665,10 +665,10 @@ int main()
 	rezultat_dat << "CELLS " << n_celic << " " << n_celic * 5 << "\n";
 	for (int celica_id = 0; celica_id < n_celic; celica_id++) 
 	{
-		int vozl_id1 = celice[celica_id][0] - 1;
-		int vozl_id2 = celice[celica_id][1] - 1;
-		int vozl_id3 = celice[celica_id][2] - 1;
-		int vozl_id4 = celice[celica_id][3] - 1;
+		int vozl_id1 = celice[celica_id][0];
+		int vozl_id2 = celice[celica_id][1];
+		int vozl_id3 = celice[celica_id][2];
+		int vozl_id4 = celice[celica_id][3];
 		rezultat_dat << "4 " << vozl_id1 << " " << vozl_id2 << " " << vozl_id3 << " " << vozl_id4 << "\n";
 	}
 
@@ -721,10 +721,10 @@ int main()
 	rezultat_dat_eigen << "CELLS " << n_celic << " " << n_celic * 5 << "\n";
 	for (int celica_id = 0; celica_id < n_celic; celica_id++)
 	{
-		int vozl_id1 = celice[celica_id][0] - 1;
-		int vozl_id2 = celice[celica_id][1] - 1;
-		int vozl_id3 = celice[celica_id][2] - 1;
-		int vozl_id4 = celice[celica_id][3] - 1;
+		int vozl_id1 = celice[celica_id][0];
+		int vozl_id2 = celice[celica_id][1];
+		int vozl_id3 = celice[celica_id][2];
+		int vozl_id4 = celice[celica_id][3];
 		rezultat_dat_eigen << "4 " << vozl_id1 << " " << vozl_id2 << " " << vozl_id3 << " " << vozl_id4 << "\n";
 	}
 
