@@ -1,0 +1,171 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{enumitem}
+
+\lstset{
+    language=C++,
+    basicstyle=\ttfamily,
+    numbers=left,
+    numberstyle=\tiny,
+    stepnumber=0.2,
+    numbersep=5pt,
+    frame=single,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=none
+}
+
+\title{Izračun porazdelitve temperature - 2D MKR\\Projektna naloga}
+\author{Matic Trojanšek}
+\date{\today}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \includegraphics[width=0.5\textwidth]{Slike/ULFS_LOGO.png}\par
+    \vspace{1cm}
+    {\scshape\LARGE \par}
+    \vspace{2cm}
+    {\huge\bfseries Izračun porazdelitve temperature - 2D MKR\\Projektna naloga \par}
+    \vspace{2cm}
+    {\Large Avtor: Matic Trojanšek in Robert Šeliga \par}
+    \vspace{0.5cm}
+    {Fakulteta za strojništvo \par}
+    \vfill
+    {\large\today \par}
+\end{titlepage}
+
+\section{Uvod}
+
+V tem projektu smo obravnavali časovno neodvisen primer prenosa toplote v 2D prerezu, kjer smo za dane robne pogoje izračunali porazdelitev temperatur.Pri tem smo predpostavili temperaturno neodvisno toplotno prevodnost in robne pogoje. Hkrati smo zanemarili notranjo generacijo toplote.\medskip\\
+Enačba \ref{eq:heat_equation} predstavlja enačbo problema:
+\begin{equation}\label{eq:heat_equation}
+    \frac{\partial}{\partial x}\left(k \frac{\partial T}{\partial x}\right) + \frac{\partial}{\partial y}\left(k \frac{\partial T}{\partial y}\right) + q = 0
+\end{equation}\medskip\\
+Problem je vseboval 3 različne tipe robnih pogojev:
+\begin{enumerate}
+    \item Temperatura $T[$°$C]$
+    \item Toplotni tok $q[W/m^2]$
+    \item Prestop toplote s topl. prestopnostjo  $h[W/m^2K]$\medskip\\
+\end{enumerate}
+Za reševanje smo uporabili metodo končnih razlik - MKR.\medskip\\
+Problem, ki je v projektni nalogi obravnavan:
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Slike/Primer1.PNG}
+    \caption{Problem projektne naloge}
+    \label{fig:Primer1}
+\end{figure}\newpage
+
+\section{MKR}
+
+V inženirskih aplikacijah se pogosto zgodi, da imamo kompleksen prerez, kjer analitična rešitev diferencialne enačbe ni mogoča. Pri tej projektni nalogi bomo uporabili metodo končnih razlik.\\
+
+Metoda končnih razlik MKR je numerična metoda, ki služi reševanju diferencialnih enačb. Diferencialno enačbo iskane
+funkcije v danem prostoru rešujemo numerično tako, da odvode funkcije aproksimiramo z difenčno shemo. 
+Pri izbrani mreži točk oziroma vozlišč v prostoru nas omenjen način privede do sistema linearnih (diferenčnih) enačb, ki 
+ga rešimo z uporabo linearne algebre. Primer te je recimo Gauss-Seidelova metoda.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{Slike/MKR.PNG}
+    \caption{Prikaz metode končnih razlik}
+    \label{fig:MKR}
+\end{figure}
+
+\subsection{Postopek reševanja z MKR}
+
+Postopek reševanja:
+\begin{itemize}
+    \item Diskretizacija modela - v našem primeru je to 2D mreža, kjer so neznanke temperature v vozliščih mreže
+    \item Pretvorba diferencialnih operatorjev v diferenčne - uporabimo pri enačbi toplotnega toka ($\partial T -> \Delta T$)
+    \item Implementacija robnih pogojev kot vir dodatnih enačb
+    \item Reševanje sistema diferenčnih enačb
+\end{itemize}
+
+\section{Reševanje linearnega sistema enačb}
+
+Pri linearnem sistemu enačb, enačbe običajno zapišemo v matriko koeficientov neznank $[A]$ in vektor vrednosti $(b)$. Matrični zapis: $[A][T]=(b)$\\
+Za reševanje takih sistemov pozamo več metod:
+\begin{itemize}
+    \item Gaussova eliminacija,
+    \item Pivotiranje,
+    \item LU dekompozica,
+    \item Gauss-Seidelova metoda,
+    \item Računanje inverza...\medskip
+\end{itemize}
+
+\subsection{Psevdokoda Gauss-Seidel metode v C++}
+
+V projektni nalogi je ena od uporabljenih metod Gauss-Seidel! Poleg tega je v psevdokodi uporabiljena še paralelizacija, ki pohitri izračunavanje for zanke, saj se paralelno izvajata 2 procesa hkrati.
+\begin{lstlisting}[caption={Psevdokoda Gauss-Seidel}, label=lst:algorithm]
+#pragma omp parallel for
+	for (int ii = 0; ii < st_it; ii++)
+	{
+#pragma omp critical
+		for (int i = 0; i < n_nodes; i++)
+		{
+			double d = b[i];
+   
+			for (int j = 0; j < n_nodes; j++)
+			{
+				if (i != j)
+				{
+				    d = d - A[i][j] * T_Gauss[j];
+				}
+			}
+			T_Gauss[i] = d / A[i][i];
+		}
+	}
+\end{lstlisting}
+
+\subsection{Rešitev linearnega sistema enačb}
+
+Rešitev sistema lineranih enačb je vektor! V našem primeru je to vektor temperatur (T), ki nam opisuje temperaturo za vsako vozlišče v mreži.\medskip\\
+Prvih nekaj temperatur projekta:\\
+$T = {[200,500,200,500,206.852,213.693,220.465,227.121,233.614,239.895,245.919,...]}$\medskip\\ 
+Opazimo lahko, da se očitno prve 4 temperature nanašajo na vozlišča na robovih, kjer je robni pogoj temperatura 500 oz. 200 °C.
+
+\section{Grafični prikaz v okolju ParaView}
+
+Da si rešitev lažje predstavljamo, je rešitev prikazana v okolju ParaView. ParaView je okolje, ki za prikaz potrebuje VTK datoteko. VTK datoteka mora vsebovati informacije o številu vozlišč in njihovih koordinatah, o vseh sosedih posameznih vozlišč, o tipu vozlišč ter o vrednosti posameznega vozlišča - v našem primeru je to temperatura $T$.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{Slike/ParaView-Projektna naloga.PNG}
+    \caption{Okolje ParaView - rešitev(Temperaturna porazdelitev)}
+    \label{fig:ParaView}
+\end{figure}
+
+\section{C++ vs. MATLAB}
+
+\begin{figure}[h]
+  \centering
+  \begin{minipage}{0.3\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{Slike/C++_LOGO.png}
+    \captionof{figure}{C++ LOGO}
+  \end{minipage}%
+  \hspace{0.05\textwidth}
+  \begin{minipage}{0.55\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{Slike/MATLAB_LOGO.png}
+    \captionof{figure}{MATLAB LOGO}
+  \end{minipage}
+\end{figure}
+Če primerjamo med seboj čas reševanja problema s programskim jezikom MATLAB in čas reševanja z jezikom C++ opazimo, da je kjub identičnem principu reševanja, C++ tisti, ki problem reši hitreje. Razlog v tem bi pripisal dejstvu, da je C++ jezik pisan na kožo procesojem, saj Windows pošilja ukaze procesorjem v C++ jeziku in jih z njim krmili.\\
+Medtem ko je MATLAB programski jezik, ki deluje preko programskega vmesnika. Torej potrebuje za izvedbo prevedbo jezika, kar seveda vzame nekoliko časa. MATLAB je jezik bolj primeren za dela z matrikami računanjem z njimi.
+
+\section{Zaključek}
+
+Ko med seboj združimo znanja programiranja, prenosa toplote, vizualizacije, matematike in logičnega razmišlanja, na koncu dobimo lahko res obsežen in zanimiv projekt. Zelo prav so nam prišli predmeti preteklih letnikov, ki smo jih imeli na faksu.
+
+Skozi pisanje in reševanje problema tega projektno je mnogokrat prišlo do zastoja,kjer je bilo potrebno kodo večkrat ponovno prebrati in stestirati, da smo jo bolje razumeli. Toda z vztrajnostjo in trdim delom se le pride do končnega rezultata, ki pa ga je vedno pametno jemati nekoliko z rezervo, saj se tekom reševanja privzame kar nekaj predpostavk.
+
+Ne glede na vse je bil projekt zanimiv in bi ga priporočal tistim, ki si res želijo programiranja in reševanja zahtevnejših izivov. Ali pa tistim, ki iščejo temo projektne naloge v smeri programiranja in jim svetujem, da rešijo problem podoben tej projektni nalogi.
+
+\end{document}
